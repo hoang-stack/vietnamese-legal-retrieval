@@ -252,7 +252,6 @@ def embed(m, texts):
 
 
 best_dev, best_epoch, history = -1.0, 0, []
-ft_dir = OUT / "e5-base-finetuned"
 for epoch in range(EPOCHS):
     model.train()
     rng.shuffle(examples)
@@ -291,8 +290,7 @@ for epoch in range(EPOCHS):
     )
     log(f"epoch {epoch + 1}: loss {total / len(examples):.4f}, dev mrr@10 {dev:.4f}")
     if dev > best_dev:
-        best_dev, best_epoch = dev, epoch + 1
-        model.save(str(ft_dir))
+        best_dev, best_epoch = dev, epoch + 1  # rankings of every epoch are already saved
 timings["finetune_history"] = history
 log(f"best epoch {best_epoch} (dev mrr@10 {best_dev:.4f})")
 best_ft = f"e5-base fine-tuned, epoch {best_epoch}"
