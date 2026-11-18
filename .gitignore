@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+.ruff_cache/
+# Downloaded at runtime (checksum-verified); Kaggle upload folder and run outputs
+data/
+kaggle/output/
+kaggle/kernel-metadata.json
+.vscode/
+.idea/
+.DS_Store
