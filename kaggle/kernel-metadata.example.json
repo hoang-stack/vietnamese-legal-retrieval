@@ -1,0 +1,15 @@
+{
+  "id": "YOUR_KAGGLE_USERNAME/vilegal-dense",
+  "title": "vilegal dense",
+  "code_file": "dense_retrieval.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": ["YOUR_KAGGLE_USERNAME/vilegal-zalo"],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
