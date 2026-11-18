@@ -115,7 +115,7 @@ def neural_stage(ds, rec: Recorder, kaggle_dir: Path) -> None:
             if split not in by_split or system == "BM25":
                 continue
             qids = sorted(ds.qrels[split])
-            ranked = [by_split[q] for q in qids]
+            ranked = [by_split[split][q] for q in qids]
             stage = "finetune_epochs" if "epoch" in system else "final"
             if stage == "final" or split == "dev":
                 rec.add(stage, system, split, ranked, [ds.qrels[split][q] for q in qids])

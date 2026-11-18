@@ -109,7 +109,7 @@ def plot_recall_curves(rows, out: Path) -> Path | None:
     ax.set_xticks([1, 2, 5, 10, 20, 50, 100], ["1", "2", "5", "10", "20", "50", "100"])
     ax.set_xlabel("k (number of articles returned)")
     ax.set_ylabel("Recall@k on test questions")
-    ax.set_ylim(0, 1)
+    ax.set_ylim(0.5, 1.0)
     ax.legend(loc="lower right", fontsize=8.5)
     ax.set_title("How many questions find their article in the top k?")
     return _save(fig, out / "recall_at_k.png")
