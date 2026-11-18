@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tra cứu pháp luật</title>
+<style>
+  :root { --bg:#f5f5f2; --panel:#fff; --ink:#1b1c1e; --muted:#6c6f75; --line:#e2e2dc;
+          --accent:#7c2d12; --hl:#fde7c8; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#131416; --panel:#1c1d20; --ink:#e8e8ea; --muted:#9a9ca3; --line:#2c2d31;
+            --accent:#fdba74; --hl:#4a3218; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 26px; margin: 0; } .sub { color: var(--muted); margin: 4px 0 18px; }
+  form { display:flex; gap:8px; }
+  input { flex:1; padding:12px 14px; font:inherit; border:1px solid var(--line); border-radius:10px;
+          background:var(--panel); color:var(--ink); }
+  input:focus { outline:2px solid var(--accent); outline-offset:-1px; }
+  button { font:inherit; padding:0 18px; border-radius:10px; border:0; background:var(--accent);
+           color:var(--panel); cursor:pointer; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 4px; }
+  .chip { font-size:13px; padding:3px 10px; border-radius:999px; border:1px solid var(--line);
+          background:var(--panel); color:var(--ink); cursor:pointer; }
+  .meta { color:var(--muted); font-size:13px; margin:14px 0 6px; min-height:20px; }
+  article { background:var(--panel); border:1px solid var(--line); border-radius:12px;
+            padding:14px 16px; margin-top:10px; }
+  .id { font-size:12.5px; color:var(--muted); font-family: ui-monospace, monospace; }
+  h2 { font-size:16px; margin:2px 0 6px; } p { margin:0; color:var(--ink); font-size:14.5px; }
+  mark { background:var(--hl); color:inherit; border-radius:3px; padding:0 1px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Tra cứu văn bản pháp luật</h1>
+  <p class="sub">BM25 tự cài đặt trên 61.425 điều luật · âm tiết + bigram · <a href="/docs">API</a></p>
+  <form id="f"><input id="q" placeholder="Ví dụ: không mang giấy phép lái xe bị phạt bao nhiêu?"
+        aria-label="Câu hỏi" autocomplete="off"><button>Tìm</button></form>
+  <div class="chips" id="ex"></div>
+  <div class="meta" id="meta"></div>
+  <div id="res"></div>
+</main>
+<script>
+const EX = ["Không mang giấy phép lái xe bị phạt bao nhiêu?", "Thủ tục đăng ký kết hôn",
+            "Điều kiện thành lập doanh nghiệp tư nhân", "Thời gian nghỉ thai sản của lao động nữ"];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => s.replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = (s) => s.normalize("NFC").toLowerCase();
+function highlight(text, q) {
+  const terms = new Set(norm(q).match(/[\p{L}\p{N}]+/gu) || []);
+  return esc(text).replace(/[\p{L}\p{N}]+/gu, (w) => terms.has(norm(w)) ? `<mark>${w}</mark>` : w);
+}
+async function go(q) {
+  $("q").value = q;
+  const r = await fetch(`/search?q=${encodeURIComponent(q)}&k=10`);
+  if (!r.ok) { $("meta").textContent = `Lỗi ${r.status}`; return; }
+  const d = await r.json();
+  $("meta").textContent = `${d.hits.length} kết quả · ${d.elapsed_ms} ms`;
+  $("res").innerHTML = d.hits.map((h) => `<article><div class="id">#${h.rank} · ${esc(h.doc_id)} · BM25 ${h.score.toFixed(2)}</div>
+    <h2>${highlight(h.title, q)}</h2><p>${highlight(h.snippet, q)}</p></article>`).join("");
+}
+$("f").onsubmit = (e) => { e.preventDefault(); if ($("q").value.trim().length > 1) go($("q").value.trim()); };
+EX.forEach((e) => { const b = document.createElement("button"); b.className = "chip"; b.type = "button";
+  b.textContent = e; b.onclick = () => go(e); $("ex").appendChild(b); });
+const pre = new URLSearchParams(location.search).get("q");
+go(pre || EX[0]);
+</script>
+</body>
+</html>
